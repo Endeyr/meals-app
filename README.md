@@ -4,10 +4,10 @@ Followed Part 2 of freeCodeCamp.org React Javascript Framework Course found here
 
 ## Concepts Used
 
-Login / Register
-Fetch data from external api
-App level state - context api : good for smaller projects, want Redux for larger projects (solves prop drilling)
-Local storage
+- Login / Register
+- Fetch data from external api
+- App level state - context api : good for smaller projects, want Redux for larger projects (solves prop drilling)
+- Local storage
 
 ## Users
 
