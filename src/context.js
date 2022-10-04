@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 
 const AppContext = React.createContext()
 
-const allMealsUrl = 'https://www.themealdb.com/api/json/v1/1/search.php?s=apple'
+const allMealsUrl = 'https://www.themealdb.com/api/json/v1/1/search.php?s='
 const randomMealUrl = 'https://www.themealdb.com/api/json/v1/1/random.php'
 
 // children prop displays all components
@@ -11,6 +11,8 @@ const AppProvider = ({ children }) => {
 	const [meals, setMeals] = useState([])
 	// Loading
 	const [loading, setLoading] = useState(false)
+	// Search state
+	const [searchTerm, setSearchTerm] = useState('')
 	// can use fetch api or axios
 	const fetchMeals = async (url) => {
 		setLoading(true)
@@ -27,13 +29,24 @@ const AppProvider = ({ children }) => {
 		setLoading(false)
 	}
 
-	// need empty dependency array or you have infinite loop
+	const fetchRandomMeal = () => {
+		fetchMeals(randomMealUrl)
+	}
+
+	// need dependency array or you have infinite loop
 	useEffect(() => {
 		fetchMeals(allMealsUrl)
 	}, [])
 
+	useEffect(() => {
+		if (!searchTerm) return
+		fetchMeals(`${allMealsUrl}${searchTerm}`)
+	}, [searchTerm])
+
 	return (
-		<AppContext.Provider value={{ loading, meals }}>
+		<AppContext.Provider
+			value={{ loading, meals, setSearchTerm, fetchRandomMeal }}
+		>
 			{children}
 		</AppContext.Provider>
 	)
