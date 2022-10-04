@@ -6,6 +6,17 @@ const AppContext = React.createContext()
 const allMealsUrl = 'https://www.themealdb.com/api/json/v1/1/search.php?s='
 const randomMealUrl = 'https://www.themealdb.com/api/json/v1/1/random.php'
 
+// local storage
+const getFavoritesFromLocalStorage = () => {
+	let favorites = localStorage.getItem('favorites')
+	if (favorites) {
+		favorites = JSON.parse(localStorage.getItem('favorites'))
+	} else {
+		favorites = []
+	}
+	return favorites
+}
+
 // children prop displays all components
 const AppProvider = ({ children }) => {
 	const [meals, setMeals] = useState([])
@@ -16,6 +27,7 @@ const AppProvider = ({ children }) => {
 
 	const [showModal, setShowModal] = useState(false)
 	const [selectedMeal, setSelectedMeal] = useState(null)
+	const [favorites, setFavorites] = useState(getFavoritesFromLocalStorage())
 	// can use fetch api or axios
 	const fetchMeals = async (url) => {
 		setLoading(true)
@@ -38,13 +50,32 @@ const AppProvider = ({ children }) => {
 
 	const selectMeal = (idMeal, favoriteMeal) => {
 		let meal
-		meal = meals.find((meal) => meal.idMeal === idMeal)
+		if (favoriteMeal) {
+			meal = favorites.find((meal) => meal.idMeal === idMeal)
+		} else {
+			meal = meals.find((meal) => meal.idMeal === idMeal)
+		}
 		setSelectedMeal(meal)
 		setShowModal(true)
 	}
 
 	const closeModal = () => {
 		setShowModal(false)
+	}
+
+	const addToFavorites = (idMeal) => {
+		const alreadyFavorite = favorites.find((meal) => meal.idMeal === idMeal)
+		if (alreadyFavorite) return
+		const meal = meals.find((meal) => meal.idMeal === idMeal)
+		const updatedFavorites = [...favorites, meal]
+		setFavorites(updatedFavorites)
+		localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
+	}
+
+	const removeFromFavorites = (idMeal) => {
+		const updatedFavorites = favorites.filter((meal) => meal.idMeal !== idMeal)
+		setFavorites(updatedFavorites)
+		localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
 	}
 
 	// need dependency array or you have infinite loop
@@ -68,6 +99,9 @@ const AppProvider = ({ children }) => {
 				selectedMeal,
 				selectMeal,
 				closeModal,
+				addToFavorites,
+				removeFromFavorites,
+				favorites,
 			}}
 		>
 			{children}
